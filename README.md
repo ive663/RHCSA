@@ -20,12 +20,22 @@ the collection of practice questions and lab environment for ex200 from all arou
 </p>
 
 ---
+## [**Vagrant Lab Setup**](VagrantPlayground/README.md) - RHCSA/RHCE Lab Environment
 
-[Vagrant Lab Enviroment Setup](VagrantPlayground/README.md)
+```
+192.168.56.254    bastion        bastion.lab.example.com
+
+192.168.56.9      workstation    workstation.lab.example.com
+192.168.56.10     servera        servera.lab.example.com
+192.168.56.11     serverb        serverb.lab.example.com
+
+192.168.56.222     ·······        use this ip for LAN access 
+```
+**NOTE**: VM's are empty inside... it's just playground enviroment to train...
 
 ---
 
-[**Red Hat Certified System Administrator (RHCSA)** exam objectives](https://www.redhat.com/en/services/training/ex200-red-hat-certified-system-administrator-rhcsa-exam?section=objectives)
+## [**Red Hat Certified System Administrator (RHCSA)** exam objectives](https://www.redhat.com/en/services/training/ex200-red-hat-certified-system-administrator-rhcsa-exam?section=objectives)
 
 
 **Study points for the exam**
