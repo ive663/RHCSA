@@ -19,6 +19,9 @@ the collection of practice questions and lab environment for ex200 from all arou
   </p> -->
 </p>
 
+
+[Vagrant Lab Enviroment Setup](VagrantPlayground/README.md)
+
 ---
 
 [**Red Hat Certified System Administrator (RHCSA)** exam objectives](https://www.redhat.com/en/services/training/ex200-red-hat-certified-system-administrator-rhcsa-exam?section=objectives)
