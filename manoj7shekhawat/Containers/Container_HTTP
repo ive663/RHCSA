@@ -1,0 +1,69 @@
+Question: As the mshekhawat user, create a detached apache HTTP web server container with the name mysite and with the tag that has the lowest version(1-112) 
+          from rhel8/httpd-24 image. Use the registry.redhat.io registry.
+
+          Create and mount the ~/storage/html/ directory as a persistent storage to the container as /var/www/. 
+          Create a sample index.html with contents as: <h1>My Container Apache HTTP Web Server</h1>
+          
+          Port 8080 on the container should be mapped to port 8080 on the host. 
+          
+          Declare the environment variables, HTTPD_USER and HTTPD_PASSWORD and use admin as their values.
+
+          Configure the container as a service using systemd and make the web server/container persistent across reboot.
+          
+          It should accessbile from node2 as http://172.24.9.10:8080/ 
+          
+          
+Soultion:
+
+yum module install container-tools
+
+podman login registry.redhat.io
+
+skopeo inspect docker://registry.redhat.io/rhel8/httpd-24
+
+podman pull registry.redhat.io/rhel8/httpd-24:1-112
+
+podman images
+
+mkdir -p ~/storage/html/
+
+cd ~/storage/html
+
+vim index.html
+           <h1>My Container Apache HTTP Web Server</h1>
+           
+podman run -d --name mysite -p 8080:8080 -v /home/mshekhawat/storage:/var/www:Z -e HTTPD_USER=admin -e HTTPD_PASSWORD=admin registry.redhat.io/rhel8/httpd-24:1-112
+
+podman ps
+
+
+loginctl show-user mshekhawat
+
+loginctl enable-user mshekhawat
+
+loginctl show-user mshekhawat
+
+mkdir -p ~/.config/systemd/user
+
+cd ~/.config/systemd/user
+
+podman generate systemd --name mysite --files
+
+systemctl --user enable container-mysite.service
+
+systemctl --user daemon-reload
+
+su -
+
+firewall-cmd --add-port=8080/tcp
+firewall-cmd --add-port=8080/tcp --permanent
+
+firewall-cmd --reload
+firewall-cmd --list-ports
+
+# Now reboot system and verify
+reboot
+podman ps
+
+# From node2
+curl http:172.24.9.10:8080 

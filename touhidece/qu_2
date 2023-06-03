@@ -1,0 +1,2 @@
+Create a catalog under /home named admins. Its respective group is requested to be the {admin} group. The group users could read and write, while other users are not allowed to access it.
+The files created by users from the same group, should also have the admin group.

@@ -1,0 +1,101 @@
+
+systemd-journald  
+	the heart of the os event logging architecture 
+	stores logging data in a structured, indexed binary file called journal
+	it include extra info about the log events
+	not persistent /run/log
+rsyslog sort&write syslog messages received from the journal
+	process syslog events recording them to its files or forwarding
+	do persist  in /var/log
+syslog logs:
+/var/log/messages
+/var/log/secure
+/var/log/maillog
+/var/log/cron
+/var/log/boot.log
+
+syslog facilities 
+kern	authpriv(secure)
+mail 	cron
+local7 (boot)
+news
+
+logging events to the system
+syslog priorities :
+0 emerg  1  alert  2  crit
+3 err  4 warning 5 notice 
+6 info  7 debug
+
+config files: 
+/etc/rsyslog.conf
+/etc/rsyslog.d/*
+
+facility.priority      instoredfile
+# vi /etc/rsyslog.conf
+        .none
+*.*      /var/log/all_journal_omar  (config all file goes to omar file)
+*.info;mail.none;authpriv.none;cron.none                /var/log/messages
+authpriv.*                                           /var/log/secure
+mail.*                                                  -/var/log/maillog
+cron.*                                                  /var/log/cron
+*.emerg                                                 :omusrmsg:*
+local7.*                                                /var/log/boot.log
+	
+# echo "*.debug /var/log/messages-debug" > debug.cong
+	(priority of debut or above)
+
+# systemctl restart rsyslog
+
+Log file rotation
+	logretate man page (not covered)
+
+Sending syslog messages manually
+
+# logger  "message without option will be sent to /var/log/messages"
+# logger -p local7.cri "message will be sent to /var/log/boot.log"
+# logger -p cron.emerg "messg will be printed to all users consol/terminal and will be ent to /var/log/cron"
+# logger -p facility.priority "messages to be printed in log"
+
+
+Journalctl
+
+/var/run
+	stores sys journal by default  (journal)
+	not persist 
+#jounalctl  (read journal db from /var/log)
+# journactl -n 5
+# journactl -f
+# journalctl -p err  (debug, info, notice, warning, err, crit, alert, emerg)
+# journalctl --since today --until now 
+	--since, --until today  yesterday  tomorrow
+# journactl --since "2021-10-20 14:34:00" --until "2021-10-20 14:35:00"
+# journalctl --since "-1 hour"
+# journalctl -f -o verbose
+	_COMM
+	_EXE
+	_PID
+	_UID
+	_SYSTEMD_UNIT
+
+# journalctl _SYSTEMD_UNIT=sshd.service _PID=1182
+
+$ sudo usermod -aG adm user
+(user)$ journalctl 
+
+Storing the system journal permanently
+
+# vi /etc/systemd/journald.conf
+Storage=persistent
+
+persistent --> Storage=persistent (/var/log/journal)
+volatile --> Storage=auto (/run/log/journal)
+# systemctl restart systemd-journald
+
+# journalctl -b 2  (look for event in the priviose boot)
+# journalctl -b (limit event for curent boot)
+
+journal not allowed to use more than 10% of the FS it is on
+param tuned for persist/volatil in /etc/systemd/jouranld.conf
+
+check current param
+# journalctl | grep -E 'Runtime|System journal'

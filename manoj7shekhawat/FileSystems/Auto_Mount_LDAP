@@ -1,0 +1,47 @@
+Question: On the node1 automount /home/harry which is exported by the server 10.0.0.4 /home/harry.
+
+Solution:
+
+On NFS Server (10.0.0.4):
+
+yum install nfs-utils
+
+systemctl enable --now nfs-server
+
+vim /etc/exports
+  - /home/harry   *(rw,no_root_squash)
+  
+systemctl daemon-reload
+
+systemctl restart nfs-server
+
+firewall-cmd --add-service=nfs
+firewall-cmd --add-service=mountd
+firewall-cmd --add-service=rpc-bind
+
+firewall-cmd --add-service=nfs --permanent
+firewall-cmd --add-service=mountd --permanent
+firewall-cmd --add-service=rpc-bind --permanent
+
+On NFS Client:
+
+yum install autofs
+
+systemctl enable --now autofs
+
+vim /etc/auto.master
+      - /home         /etc/auto.home
+      
+cp /etc/auto.misc   /etc/auto.home
+
+vim /etc/auto.home
+      - *       -rw     10.0.0.4:/home/&
+      
+systemctl restart autofs
+
+su - harry
+
+# To verify:
+pwd
+
+df -h

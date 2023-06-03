@@ -1,0 +1,8 @@
+Question: On node1 on eth1, add IP: 172.24.9.10, Gateway: 172.24.9.2, DNS: 172.24.9.0. Also make the hostname as: node1.server9.example.com
+
+Solution:
+
+# Easy way to do this is via
+nmtui
+
+# Reference: https://linuxconfig.org/rhel-8-configure-static-ip-address

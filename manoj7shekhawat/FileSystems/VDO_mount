@@ -1,0 +1,71 @@
+Question: Use the un-partioned disk and make its size of 50 GB mounted persistently on /vdomyvdo
+
+Solution:
+
+# Check which device is un-partioned
+lsblk 
+
+# Partition the disk
+fdisk /dev/sdc
+
+lsblk 
+
+# make sure the needed packages and service is enabled 
+yum install vdo kmod-kvdo
+
+systemctl enable --now vdo
+
+systemctl status vdo
+
+# Check command in vdo man page
+man vdo
+
+vdo create --name=myvdo --device=/dev/sdc1 --vdoLogicalSize=10T
+
+# Don't forget -K option
+mkfs.xfs -K /dev/mapper/myvdo 
+
+mkdir /myvdo
+
+vim /etc/fstab 
+    /dev/mapper/myvdo	/myvdo		xfs	defaults,x-systemd.requires=vdo.service	0 0
+
+df -h
+mount -a
+df -h
+systemctl daemon-reload 
+
+# Reboot and verify
+reboot 
+df -h
+
+# Optional
+# We can mount using systemd also
+
+cd /etc/systemd/system
+
+cp /usr/share/doc/vdo/examples/systemd/VDO.mount.example myvdo.mount
+
+vim myvdo.mount
+    [Unit]
+    Description = Mount filesystem that lives on VDO
+    name = VDO.mount
+    Requires = vdo.service systemd-remount-fs.service
+    After = multi-user.target
+    Conflicts = umount.target
+ 
+    [Mount]
+    What = /dev/mapper/myvdo
+    Where = /myvdo
+    Type = xfs
+    Options = discard
+
+    [Install]
+    WantedBy = multi-user.target
+    
+    
+systemctl enable --now myvdo.mount
+
+# Reboot and verify
+reboot 
+df -h

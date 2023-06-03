@@ -1,0 +1,24 @@
+Question: Make node1 server as NTP server to utility.server9.example.com (172.24.9.40)
+
+Solution:
+
+vim /etc/chrony.conf
+
+allow 172.24.9.0/24
+
+systemctl daemon-reload
+
+# then restart the chronyd
+
+systemctl restart chronyd
+
+# Finally add ntp service to firewall
+
+firewall-cmd --add-service=ntp --permanent
+
+firewall-cmd --add-service=ntp
+
+firewall-cmd --reload
+
+
+# Reference:: https://linuxconfig.org/redhat-8-configure-ntp-server

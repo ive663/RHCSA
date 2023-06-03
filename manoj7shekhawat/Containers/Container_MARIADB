@@ -1,0 +1,51 @@
+Question: Run a root container for MariaDB, following conditions should be met:
+          - Container name should be mariadb
+          - Container must be accessible at port 3206
+          - root password is set to password
+          - DB USER should be: muser and password: mpassword
+          - Database name should be mydb
+          - The directory /opt/mariadb on host should be mapped to /var/lib/mariadb in the container
+          - It should be configured such that it automatically starts when the system is rebooted.
+
+Credit: Sander van Vugt, question from Red Hat Certified System Administrator (RHCSA), 3/e
+
+Solution:
+
+yum module install container-tools
+
+podman login registry.redhat.io
+
+podman pull registry.redhat.io/rhel8/mariadb-103
+
+# Check image is downloaded
+podman images
+
+podman inspect registry.redhat.io/rhel8/mariadb-103
+
+mkdir -p /opt/mariadb
+
+podman run -d --name mariadb -e MYSQL_USER=muser -e MYSQL_PASSWORD=mpassword -e MYSQL_DATABASE=mydb \
+-e MYSQL_ROOT_PASSWORD=password -p 3306:3306 -v /opt/mariadb:/var/lib/mariadb:Z rhel8/mariadb-103
+
+# verify it is running
+podman ps
+
+loginctl show-user root
+
+loginctl enable-linger root
+
+# Verify
+loginctl show-user root
+
+cd /etc/systemd/system/
+
+podman generate systemd --name mariadb --files 
+
+systemctl enable container-mariadb.service
+
+systemctl daemon-reload
+
+# Reboot to verify
+reboot
+
+podman ps

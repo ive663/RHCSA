@@ -1,0 +1,37 @@
+NFS server side :
+
+yum -y install nfs-utils 
+yum install nfs-kernel-server
+
+sudo mkdir /mnt/myshareddir
+
+sudo chown nobody:nogroup /mnt/myshareddir #no-one is owner 
+sudo chmod 777 /mnt/myshareddir #everyone can modify files
+
+vi    /etc/exports
+
+/mnt/myshareddir {clientIP-1}
+(rw,sync,no_subtree_check)
+{clientIP-2}(...)
+{clientIP-3}(...)
+
+/mnt/myshareddir 
+{subnetIP}/{subnetMask}
+(rw,sync,no_subtree_check)
+
+
+sudo exportfs -a #making the file share available 
+sudo systemctl restart nfs-kernel-server #restarting the NFS kernel
+
+ sudo ufw allow
+
+NFS client side : 
+sudo yum install nfs-utils
+sudo mkdir /var/locally-mounted
+sudo mount -t nfs {IP of NFS server}:{folder path on server} /var/locally-mounted
+sudo mount -t nfs 192.168.20.100:/myshareddir /var/locally-mounted
+
+vi   /etc/fstab
+{IP of NFS server}:{folder path on server} /var/locally-mounted nfs defaults 0 0
+mount /var/locally-mounted 
+mount {IP of NFS server}:{folder path on server}

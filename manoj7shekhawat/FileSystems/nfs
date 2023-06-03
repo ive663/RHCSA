@@ -1,0 +1,100 @@
+# Question: On server node
+#		- Create a directory /nshare1 & /nshare2
+#		- Create few files nfile0, nfile1, ...nfile9 under /nshare1
+#		- Create few files mfile0, mfile1, ...mfile9 under /nshare2
+#		- Share /nshare1 and /nshare2 as a NFS share directory for client server
+#
+#	    On client server
+#		- mount /nshare1 on /mynshare1
+#		- auto mount /nshare2 on /share/mynshare2 when needed
+#		- make sure they are mounted persistently even after reboot
+
+
+
+Solution:
+
+# On server:
+yum group list --hidden | grep File
+
+yum group install "Network File System Client"
+
+systemctl enable --now nfs-server.service 
+
+vim /etc/exports
+	/nshare1	*(rw,no_root_squash)
+	/nshare2	*(rw,no_root_squash)
+
+systemctl daemon-reload 
+
+showmount -e localhost
+
+systemctl restart nfs-server.service 
+
+showmount -e localhost
+
+firewall-cmd --add-service=nfs 
+firewall-cmd --add-service=nfs --permanent 
+firewall-cmd --add-service=mountd 
+firewall-cmd --add-service=mountd --permanent 
+firewall-cmd --add-service=rpc-bind 
+firewall-cmd --add-service=rpc-bind --permanent 
+firewall-cmd --reload 
+
+showmount -e localhost
+
+
+# On client
+yum group list --hidden | grep File
+
+yum group install "Network File System Client"
+
+showmount -e 10.0.0.4
+
+mkdir /mynshare1
+
+vim /etc/fstab 
+	10.0.0.4:/nshare1	/mynshare1	nfs	_netdev	0 0
+mount -a
+
+systemctl daemon-reload
+
+
+systemctl enable --now autofs.service 
+
+vim /etc/auto.master
+	/share	/etc/auto.share
+
+cp /etc/auto.misc /etc/auto.share
+
+vim /etc/auto.share 
+	mynshare2	-ro	10.0.0.4:/nshare2
+
+systemctl daemon-reload 
+
+cd /
+
+ls
+
+systemctl restart autofs.service 
+
+# Now /share should be there
+ls
+
+cd share/
+
+# Empty directory
+ls
+
+# Mount 10.0.0.4:/nshare2 still NOT mounted
+df -h
+
+cd mynshare2
+
+# Now 10.0.0.4:/nshare1 will be mounted
+df -h
+
+
+# reboot to verify
+reboot 
+
+df -h

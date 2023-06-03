@@ -1,0 +1,5 @@
+Question: There is already an LVM mounted on /dev/myvg/mylv. We need to extend it by 500 MB.
+
+Solution:
+
+lvextend -r -L +500M mylv myvg

@@ -1,0 +1,19 @@
+To update Kernel:
+#rpm -ivh [kernel.rmp] --> Install a rpm package in verbose mode
+	OR
+#yum install kernel --> (If you're using repositories)
+
+It's important to know that this doesn't replace the actual kernel. It is installed along the actual kernel and you can select any available kernel to boot the system in case of troubleshooting.
+
+Also, the system only saves a maximum of 4 kernels. If you already have 4, and install a 5th kernel, this one will replace the oldest kernel.
+
+-----------
+To set a default kernel:
+	- We can use grubby command tool.
+
+#grubby --default-kernel 		--> Get default kernel (It's probably that the latest installed be selected)
+#grubby --info=ALL | grep ^kernel 	--> This command list all kernel paths for the available kernels.
+#grubby --set-default=[kernel path obtained from the above command]
+
+Reboot and verify
+#uname -r --> Get the loaded kernel

@@ -1,0 +1,34 @@
+Mounting and Unmounting NFS Shares :
+
+NFS server export shares (directories)
+NFS clients mounat an exported shares to a local mountpoint (directory)
+
+Mount / of the NFS server explore shares
+#sudo mkdir mountpoint
+#sudo mount serverb:/    mountpoint
+#sudo ls mountpoint
+	shares
+
+#mkdir /public
+#sudo mount -t nfs -o rw,sync serverb.domain.name:/share/public /public
+	(default is asynchronous)
+#ls -l /public
+#mount | grep public
+#umount /public
+
+#sudo vim /etc/fstab
+serverb.domain.name:/share/public  /public  nfs  rw,soft  0  0
+#sudo  mount  /public
+#systemctl reboot
+
+
+Mounting NFS shares with the Automlounter :
+
+The automounter is a service (autofs) that automatically mount NFS shares "on-demand", and will auto umount them when
+they are no longer used
+
+that automounter is client side config, no server-side config is required
+
+#sudo yum install autofs
+#sudo vim /etc/auto.master.d/demo.autofs
+	/shares  /etc/auto.demo

@@ -1,0 +1,20 @@
+Question: Tune the current system and modify the profile to best suite the node2. Make sure it remains persistent after reboot.
+
+Solution:
+
+# Check tuned service is running
+systemctl status tuned.service
+
+# If it is not running then enable it
+systemctl enable --now tuned.service
+
+# Check current profile
+tuned-adm list
+
+# Change profile to virtual-guest
+tuned-adm profile virtual-guest
+
+# Verify again after reboot
+reboot
+
+tuned-adm active

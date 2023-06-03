@@ -1,0 +1,28 @@
+Question: Create a new group admingrp.
+          Create two users natasha and harry who belongs to admingrp as a secondary group.
+          Create user sarah who does not have access to an interactive shell on the system, and who is not a member of admingrp.
+          natasha, harry, and sarah should all have the password as nimsdreg
+          
+Solution:
+
+groupadd admingrp
+
+useradd natasha
+useradd harry
+useradd -s /sbin/nologin sarah
+
+
+usermod -aG admingrp natasha
+usermod -aG admingrp harry
+
+passwd natasha
+passwd harry
+passwd sarah
+
+# Verify
+
+lid -g admingrp
+
+id natasha
+id harry
+id sarah

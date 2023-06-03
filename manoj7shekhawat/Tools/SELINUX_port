@@ -1,0 +1,15 @@
+Question: Adjust the context of port 2332 to xen_port_t using the tcp protocol.
+          - Adjust SELinux so that it runs in permissive mode
+          
+          
+Solution:
+
+semanage port -l | grep 2332
+
+semanage port -a -t xen_port_t -p tcp 2332
+
+semanage port -l | grep 2332
+
+vim /etc/sysconfig/selinux
+
+setenforce permissive

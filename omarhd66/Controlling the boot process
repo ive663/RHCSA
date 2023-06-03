@@ -1,0 +1,57 @@
+########################################################
+# Resetting the root password from the boot loader
+########################################################
+press any key and chose kernel
+press e
+rd.break   enforcing=0 (initramfs)
+ctrl+x
+
+mount -o remount,rw /sysroot
+chroot /sysroot
+        passwd root
+        touch /.autorelabel   (necessary)
+        mount -o remount,ro /
+        exit
+exit
+
+If not working
+press any key and chose kernel
+press e
+Replace ro crashkernal=auto by
+rd.break   enforcing=0 (initramfs)
+ctrl+x
+
+mount -o remount,rw /sysroot
+chroot /sysroot
+        passwd root
+        touch /.autorelabel   (necessary)
+        mount -o remount,ro /
+        exit
+exit
+
+Repairing file system issues at boot
+error on fstab
+
+press any key and chose kernel
+press e
+systemctl.unit=emergency.target
+ctrl+x
+
+mount | grep / (ro)
+mount -o remount,rw /
+mount -a
+	error
+vim /etc/fsrab
+systemctl daemon-reload
+mount -a
+sustemctl reboot
+
+Grub
+
+dimanche 31 octobre 2021
+21:50
+
+#vi /etc/default/grub
+      "remove rhgb quiet"
+   
+#grub2-mkconfig -o /boot/grub2/grub.cfg

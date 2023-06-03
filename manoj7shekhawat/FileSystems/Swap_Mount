@@ -1,0 +1,27 @@
+Question: Add a 756M swap space and make sure it remains persistent after reboot.
+
+Solution:
+
+lsblk 
+
+fdisk /dev/nvme0n1
+
+lsblk 
+
+mkswap /dev/nvme0n1p4
+
+vim /etc/fstab 
+    /dev/nvme0n1p4	swap	swap	defaults	0 0
+    
+mount -a
+
+# Check existing swap
+free -m
+
+swapon -a
+
+# After swapon we should now see extended swap
+free -m
+
+# Reboot to verify
+reboot

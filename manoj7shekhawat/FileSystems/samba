@@ -1,0 +1,69 @@
+# Question: Configure samba share on server as:
+#		- create a directory /sambadir and samba share with name: sshare 
+#		- create samba user suser with password Welcome1
+#		- make sure /sambadir is accessible via client server
+#
+#	    On client server
+#	    	- Mount samba share: sshare on /mysb dir
+#	    	- Make sure it is mounted persistently after reboot
+
+
+# Solution:
+
+# On server:
+yum search samba
+
+yum install samba samba-client
+
+systemctl enable --now smb.service 
+
+systemctl status smb.service
+
+mkdir /sambadir
+
+useradd suser
+
+smbpasswd -a suser
+
+cd /
+
+chown -R suser:suser sambadir
+
+chmod 0770 sambadir
+
+chcon -t samba_share_t sambadir/
+
+vim /etc/samba/smb.conf
+	[sshare]
+	comment = My Samba Share
+	path = /sambadir
+	write list = suser
+
+systemctl daemon-reload
+
+systemctl restart smb.service 
+
+firewall-cmd --add-service=samba
+
+firewall-cmd --add-service=samba --permanent 
+
+firewall-cmd --reload
+
+# On client
+yum install samba-client
+
+smbclient -L 10.0.0.4
+
+mkdir /mysb
+
+vim /etc/fstab
+	//10.0.0.4/sshare	/mysb	cifs	_netdev,username=suser,password=Welcome1	0 0
+
+mount -a
+
+systemctl daemon-reload
+
+# Reboot to verify
+reboot
+
+df -h

@@ -1,0 +1,68 @@
+Question: Use the unpartitioned disk
+		- The volume is named 'mysfs' belongs to 'myspool'
+		- The volume must be mounted permanent under '/svol'
+		- Create 10 files with names file0, file1, ..file9 under /svol
+		- Take a snapshot of mysfs named mysnp
+		- It should be mounted persistently using UUID.
+
+Solution:
+
+yum search stratis
+
+yum install stratisd stratis-cli
+
+systemctl enable --now stratisd
+
+systemctl status stratisd.service
+
+# Find unpartitioned disk
+lsblk
+
+# Make partition
+fdisk /dev/sdc
+
+lsblk
+
+# Check example commands
+man stratis 
+
+stratis pool create myspool /dev/sdc1
+
+stratis pool list
+
+stratis filesystem create myspool mysfs
+
+stratis filesystem list
+
+mkdir /svol
+
+# find UUID
+blkid /dev/stratis/myspool/mysfs
+ 
+vim /etc/fstab
+	UUID="aa554e1f-d4b2-4a94-b1e4-d4c2d663a1fe"	/svol	xfs	defaults,x-systemd.requires=stratisd.service	0 0
+
+mount -a
+
+systemctl daemon-reload
+
+df -h
+
+# Reboot and verify it is mounted persistently
+reboot
+
+
+# Now create snapshot
+# File create the files
+cd /svol
+
+touch file{0..9}
+
+ls
+
+stratis filesystem snapshot myspool mysfs mysnp
+
+stratis filesystem list
+
+# Check the size
+stratis blockdev list myspool

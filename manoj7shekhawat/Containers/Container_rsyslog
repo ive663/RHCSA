@@ -1,0 +1,73 @@
+Question: Download root less container image rsyslog for user adam.
+          - Mount volume: /home/mshekhawat/log to /var/log in container.
+          - Also make use that container comes up automatically when system is rebooted.
+          
+  
+Solution:
+
+yum module install container-tools
+
+podman login registry.redhat.io
+
+podman pull registry.redhat.io/rhel8/rsyslog
+
+# Verify that image is downloaded
+podman images
+
+# Inspect to see its usage
+podman inspect registry.redhat.io/rhel8/rsyslog
+
+# make directory
+mkdir -p /home/mshekhawat/log
+
+# run conatiner
+podman run -d --privileged --name rsyslog --net=host --pid=host -v /home/mshekhawat/log:/var/log:Z --restart=always registry.redhat.io/rhel8/rsyslog:latest /bin/rsyslog.sh
+
+# Verify it is running
+podman ps
+
+# Check the linger state
+loginctl show-user mshekhawat
+
+# Enable linger for user
+loginctl enable-linger mshekhawat
+
+# Verify Linger=yes for mshekhawat
+loginctl show-user mshekhawat
+
+# Create user systemd directory
+mkdir -p .config/systemd/user
+
+cd .config/systemd/user
+
+# Generate service file
+podman generate systemd --name rsyslog --files
+
+# enable user container service
+systemctl --user enable container-rsyslog.service
+
+# reload daemon
+systemctl --user daemon-reload
+
+# reboot to verify that container is still up after rebooting
+reboot
+
+podman ps
+
+
+# If it is not started then check Restart under [Service] if it is set to on-failure
+systemctl --user cat container-rsyslog.service
+
+# Overwrite Restart to always and RestartSec to 1 in nano editor
+systemctl --user edit container-rsyslog.service
+          [Service]
+          Restart=always
+          RestartSec=1
+          
+# reload daemon
+systemctl --user daemon-reload
+
+# reboot to verify that container is indeed up after rebooting
+reboot
+
+podman ps

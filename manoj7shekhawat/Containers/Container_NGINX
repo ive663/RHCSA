@@ -1,0 +1,57 @@
+Question: Run a non root NGINX container with name nginx
+	- map host port 8081 to 8080 of container
+	- Create a sample index.html under /home/mshekhawat/html having content as:
+		- <h1>My RHEL NGINX Container</h1>
+	- map /home/mshekhawat/html to /opt/app-root/src of container
+	- Make sure it is running even after system reboot	
+
+Solution:
+
+yum module install container-tools
+
+podman login registry.access.redhat.com
+
+podman pull registry.access.redhat.com/ubi8/nginx-120
+
+# Verify image is downloaded
+podman images
+
+# Inspect image for usage
+podman inspect registry.access.redhat.com/ubi8/nginx-120
+
+mkdir ~/html
+
+vim ~/html/index.html
+	-  <h1>My RHEL NGINX Container</h1>
+
+podman run -d --name nginx -p 8081:8080 -v /home/mshekhawat/html:/opt/app-root/src:Z registry.access.redhat.com/ubi8/nginx-120 nginx -g "daemon off;"
+
+podman ps
+
+mkdir -p /home/mshekhawat/.config/systemd/user
+
+cd /home/mshekhawat/.config/systemd/user
+
+loginctl enable-user mshekhawat
+
+loginctl show-user mshekhawat
+
+podman generate systemd --name nginx --files
+
+systemctl --user enable container-nginx.service 
+
+systemctl --user daemon-reload 
+
+su -
+
+firewall-cmd --add-port=8081/tcp --permanent
+firewall-cmd --add-port=8081/tcp
+firewall-cmd --reload
+
+# Reboot to verify
+reboot
+
+podman ps
+
+# on node2
+curl 172.24.9.10:8080

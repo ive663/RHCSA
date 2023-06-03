@@ -1,0 +1,55 @@
+TAR GZIP  BZIP2   SFTP
+
+Gzip and Bzip2:
+Compress:
+    # gzip file                           #file will no longer existed, it will be file.gz
+    # bzip2 file                        #file will no longer existed, it will be file.bz2
+Extract:
+    # gzip -d file.gz                 #file.gz will no long existed, unziped to file
+    # bzip2 -d file.bz2            #file.bz2 will no long existed, unziped to file
+
+Tar:
+Compress:
+    # tar -cvf compressed-file.tar file         #tar keep file 
+    # tar -cvzf compressed-file.tar.gz file
+    # tar -cvjf compressed-file.tar.bz2 file
+    # tar -cvJf f.tar.zx  file dir 
+List Contents:
+    # tar -tf file.tar.gz
+    # tar -tzf file.tar.gz
+    # tar -tjf file.tar.bz2
+Extract: 
+    # tar -xvf file
+    # tar -xvfz file
+    # tar -xvfj file
+    # tar -xcfj file.
+    # tar -
+    
+
+Exemple :
+tar -cvzf /mnt/glusterfs/wscm/20180915_pg_dump_cdrs_WSCMMASTER.sql.gz 20180915_pg_dump_cdrs_WSCMMASTER.sql
+
+-rw-r--r-- 1 postgres postgres  19G Sep 15  2018 20180915_pg_dump_cdrs_WSCMMASTER.sql
+Result : 
+-rw-r--r-- 1 root     root     4.0G Sep 14 01:23 20180915_pg_dump_cdrs_WSCMMASTER.sql.gz
+
+
+Star:
+Install Star:
+    # sudo yum install star
+Create Archive:
+    # star -c -f=compressed-file.star file
+Create Archive with extended attributes and ACLs:
+    # star -xattr -H=exustar -c -f=compressed-file.star file
+List Contents:
+    # star -t -f=compressed-file.star
+Extract:
+    # star -x -f=compressed-file.star
+
+
+SFTP:
+# sftp   omar@monit
+# get file
+# mkdir /home/omar/dir
+# cd /home/omar/dir
+# put /etc/host

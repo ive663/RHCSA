@@ -1,0 +1,65 @@
+Question: Create two groups: students and profs
+	- Add two users: natasha and harry to students group
+	- Add two users: amy and anna to profs group
+	- Create two directories: /data/students and /data/profs so that:
+		- all students have read/write access to /data/students
+		- all profs have read/write access to /data/profs
+		- others have no access to /data/students and /data/profs
+		- files created under /data/students and /data/profs are owned by respective groups
+		- Only the owner of the file can delete the file created under /data/profs and /data/students
+		- User anna is the head master and have full read and write access to both directories /data/students and /data/profs
+		- Also make sure that members of group profs have read access to /data/students
+
+Credit:: Sander van Vugt, question from his video course. 
+
+Solution:
+
+groupadd students
+groupadd profs
+
+useradd natasha
+useradd harry
+useradd amy
+useradd anna
+
+usermod -aG students natasha
+usermod -aG students harry
+
+# Verify group students
+lid -g students
+
+usermod -aG profs anna
+usermod -aG profs amy
+
+# Verify group profs
+lid -g profs
+
+mkdir -p /data/students
+mkdir -p /data/profs
+
+cd /data/
+
+# Check current permissions
+ls -ltr
+
+# Sticky bit: 1, Owned by group: 2 --> Total: 1+2=3
+chmod 3770 students
+chmod 3770 profs
+
+# Anna being head master
+chown anna:students students
+chown anna:profs profs
+
+# Check current permissions
+ls -ltr
+
+# Now we need to give ACL on students directory for profs group:
+getfacl students/
+
+setfacl -m d:g:profs:rx students
+setfacl -m g:profs:rx students
+
+# Verify the ACLs
+getfacl students/
+
+# Do little unit testing if time permits :)

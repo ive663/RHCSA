@@ -1,0 +1,253 @@
+introducing containers
+
+two applications (httpd, sshd) on the same system might require different versions of the same software
+
+One way to resolve these conflicts is to package and deploy the application as a container. A
+container is a set of one or more processes that are isolated from the rest of the system.
+
+containers and VMs Both technologies isolate their application libraries and runtime resources from the host operating system or hypervisor and vice versa.
+
+Containers are an efficient way to provide reusability and portability of hosted applications.
+
+Container images package an application together with all its dependencies, such as:
+• System libraries
+• Programming language runtimes
+• Programming language libraries
+• Configuration settings
+• Static data files
+
+Rootless containers : Containers run by non-privileged users are called rootless containers.
+
+A better design runs each component, the web server, the database, and the messaging system, in
+separate containers. This way, updates and maintenance to individual application components do
+not affect other components or the application stack.
+
+podman
+skopeo
+buildah
+
+OpenShift is a set of modular components and services built on top of the Kubernetes infrastructure
+
+What are the three core technologies used to implement containers in Red Hat
+Enterprise Linux container? (Choose three.)
+b. Control Groups (cgroups) for resource management.
+c. Namespaces for process isolation.
+e. SELinux and Seccomp for security.
+
+
+Running containers
+
+mardi 5 octobre 2021
+23:44
+
+Running Rootless Containers
+On the container host, you can run containers as the root user or as a regular, unprivileged user.
+Containers run by non-privileged users are called rootless containers.
+-rootless containers cannot publish their network services through the container host's privileged ports (those below port 1024).
+-You can run containers directly as root, if necessary, but this somewhat weakens the security of the system if a bug allows an attacker to compromise the container.
+
+
+
+Running a basic container :
+
+# yum module install container-tools
+	(podman, skopeo)
+
+container registry
+local system
+private registry controlled by an organisation
+
+$ grep -A 5 'registry.search'  /etc/container/registry.conf
+registry.redhat.io
+registry.connect.redhat.com
+registry.access.redhat.com
+https://access.redhat.com/containers
+
+containers naming convention :
+registry_name/user_name/image_name:tag
+
+$podman pull registry.access.redhat.com/ubi8/ubi:latest
+$podman images
+$podman run -it registry.access.redhat.com/ubi8/ubi:latest
+$poman run -it --name=rhel8  registry.access.redhat.com/ubi8/ubi /bin/bash
+	#cat /etc/os-release
+$podman run --rm ubi cat /etc/os-release
+
+containers utilize Linux namespaces to provide separate, isolated environments for ressources, such as processes, network communications, and volumes/
+$poman run -it ubi /bin/bash
+	#ps aux
+	#id
+	#exit
+$id
+container user name and id != host user name and id
+
+$podman login registry.lab.example.com
+$podman run -it --name myweb registry.lb.example.com/rhel8/httpd-24  /bin/bash -v
+
+
+Finding and managing container images :
+
+$cat /etc/containers/registries.conf
+   rootless : $HOME/.config/conatainers
+ [registries.search]
+ registries = ['registry.redhat.io', 'quay.io', 'docker.io']
+
+$podman info 
+..
+  - registry.redhat.io
+  - quay.io
+  - docker.io
+---
+$podman search registry.redhat.io/rhel8
+$podman search --no-trunc registry.access.redhat.com/rhel8  (diplay all)
+	--limit    <number>  : Limits the number of listed images per registry.
+	--filter  <filter=value>    : stars=<number>      is-automated=<true|false>    is-official=<true|false>
+	--tls-verify  --tls-verify <true|false>
+
+$skopeo inspect docker://registry.redhat.io/rhel8/python-36  (remote/locale image)
+$poman images
+	registry.redhat.io/rhel8/python-36 ...
+$podman inspect registry.redhat.io/rhel8/python-36  (local image with more detail than skopeo)
+
+$podman images
+$podman rmi registry.redhat.io/rhel8/python-36
+
+Managing containers:
+$podman ps
+$podamn ps -a
+$podman stop my-httpd-con
+$podman stop -a
+$podman restart my-http-con
+$podman rm my_db
+$podman rm -a
+
+$podman kill my-httpd-con
+$podman kill -s SIGKILL my-httpd-con
+
+$podman exec con-id/name  cat /etc/redhat-release
+$podman exec -it my_webserver /bin/server
+
+
+
+
+Performing advanced container management :
+
+PORT
+$podman run -d -p 8000:8080 registry.redhat.io/rhel8/httpd-24
+(8000<1024 ok for rootless containers)
+
+$podman port -a
+
+$firewall-cmd --add-port=8000/tcp 
+
+ENV
+$podman inspect registry.redhat.io/rhel8/mariadb-103:1-102
+
+$podman run -d --name mydb -e MYSQL_USER=user1 -e MYSQL_PASSWORD=redhat -e MYSQL_DATABASE=items -e MYSQL_ROOT_PASSWORD=redhat -p  3306:3306 mariadb
+$mysql -u user1 -p --port=3306 --host=127.0.0.1
+	sdfg
+	>show databases;
+
+
+Attaching persistent storage to a container :
+
+$mkdir dbfiles
+$podman run -d --name mydb -v /home/ex200/dbfiles:/var/lib/mysql:Z 
+-e MYSQL_USER=user  -e MYSQL_PASSWORD=redhat -e MYSQL_DATABASE=inventory
+register.redhat.io/rhel8/mariadb-103:1-102
+	:Z for selinux
+	
+$mkdir - ~/webcontent/html/
+echo "hello world, this is from webcontent/html"   >  ~/webcontent/html/index.html
+
+$ls -Zd ~/webcontent/html/
+$ls -Z ~/webcontent/html/
+
+$skopeo inspact docker;//registry.lab.example.com/rhel8/httpd-24
+	choose a recent tag
+
+$podman run -d -v ~/webcontent/html/:/var/www:Z --name myweb -p 8080:8080 registry.redhat.io/httpd-24:1-105
+
+$podman ps
+curl 
+…..
+
+Manage containers by systemd 
+
+vendredi 8 octobre 2021
+03:47
+
+
+Rootless user:
+you cannot start rootless containers with system accounts. (-r)
+
+Running Systemd Services as a Regular User :
+To define systemd user services, create the ~/.config/systemd/user/ directory to store your unit files.
+
+1)
+# useradd contsvc
+# passwd contsvc
+	redhat
+# su contsvc
+$mkdir -p ~/.conf/conatiners
+$ cp /etc/containers/registries.conf    ~/.conf/conatiners
+-->confirm user can use registies
+(Si le repo est insecure add it in the zone 
+[registries.insecure]
+registries = [ 'registry.lab.example.comm']
+Else there will be a problem in the login)
+
+$podman login registry.redhat.io
+     omar_elhaoudar
+     @redhat@orange@com
+$ podman search uib
+	...
+
+$ mkdir -p ~/webcontaint/html
+$ echo "hello html user, this is from contsvc user" > ~/webcontaint/html/index.html
+2)
+$podman run -d --name myweb -p 8080:8080 -v ~/webcontent:/var/www:Z httpd-24
+$curl http://localhost:8080/    ($dnf install httpd if not working)
+
+Manage containers by systemd 
+	
+	systemd unit file for managing myweb container with systemctl, The following example uses the podman generate systemd 
+	command to create the unit file for the existing web container
+3)
+$ mkdir -p ~/.config/systemd/user
+$ cd ~/.config/systemd/user
+$ podman generate systemd --name myweb --files --new 
+       -->/home/contsvc/.config/systemd/user/container-myweb.service
+       "--new  delete the con when its stopped"
+
+$ podman stop myweb
+$ podman rm myweb
+$ export XDG_RUNTIME_DIR=/run/user/$(id -u)   (if working from SSH session, no need with console)
+$ systemctl --user deamon-reload
+$ systemctl --user enable --now container-myweb
+$ podman ps
+$ curl http://localhost:8080/
+	hello
+$systemctl --user stop container-myweb
+$ podman ps --all
+rien
+$ systemctl --user start container-myeb     
+$ podman ps 
+-->myweb
+¨
+--linger
+When you enable a user service as a non-root user, that service automatically starts when you
+open your first session through the text or graphical consoles or using SSH. The service stops
+when you close your last session. This behavior differs from the system services, which start when
+the system starts and stop when the system shuts down.
+4)
+$podman ps
+$ loginctl enable-linger
+$ loginctl show-user contsvc
+$ systemctl reboot
+$ podman ps
+
+
+
+
+

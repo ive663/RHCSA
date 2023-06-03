@@ -1,0 +1,7 @@
+Question: Find out all the columns that contains the string seismic within /usr/share/dict/words, then copy all these columns to /root/lines.
+          They should be in original order, there is no blank line, all columns must be the accurate copy of the original columns. 
+
+
+Solution:
+
+grep seismic /usr/share/dict/words > /root/lines

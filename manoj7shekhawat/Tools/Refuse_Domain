@@ -1,0 +1,7 @@
+Question: Refuse domain 172.25.0.0/16 to access the server.
+
+
+Solution:
+
+# firewall-cmd --zone=block --add-source=172.25.0.0/16 --permanent
+# firewall-cmd --reload

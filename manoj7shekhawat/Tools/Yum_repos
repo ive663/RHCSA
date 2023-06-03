@@ -1,0 +1,20 @@
+Question: On node1 add two repos http://network9.example.com/BaseOS & http://network9.exaample.com/AppStream
+
+Solution:
+
+cd /etc/yum.repo.d/
+
+vim baseos.repo
+  name=Base OS repo
+  baseurl=http://network9.example.com/BaseOS
+  gpgcheck=0
+  
+vim appstream.repo
+  name=App Stream repo
+  baseurl=http://network9.example.com/AppStream
+  gpgcheck=0
+  
+  
+# Verify:
+
+yum repolist

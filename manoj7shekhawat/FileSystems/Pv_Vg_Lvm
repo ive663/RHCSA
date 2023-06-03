@@ -1,0 +1,38 @@
+Question: Create a volume group with name myvgex, and set 16M as a extends. And divided a volume group containing 50 extends on volume group lvext, 
+	  make it as ext4 file system, and mounted automatically under /mnt/lvext.
+
+Solution:
+
+fdisk /dev/sda
+	- Create two Linux LVM as /dev/sda1 /dev/sda2
+
+pvcreate /dev/sda1 /dev/sda2
+
+vgcreate myvgex --physicalextentsize 16M /dev/sda1 /dev/sda2
+
+lvcreate -n lvext --extents 50 myvgex
+
+	- In case of error in size, extend volume group as:
+	- fdisk /dev/sda to create Linux LVM as /dev/sda3
+	- pvcreate /dev/sda3
+	- vgextend myvgex /dev/sda3
+
+# now it should have suff. space
+
+lvcreate -n lvext --extents 50 myvgex
+
+mkfs.ext4 /dev/mapper/myvgex-lvext -L VGEXT
+
+blkid /dev/mapper/myvgex-lvext
+
+mkdir -p /mnt/lvext
+
+vim /etc/fstab
+	- LABEL="VGEXT"   /mnt/lvext      ext4    defaults        0 0
+
+mount -a
+
+systemctl daemon-reload
+
+# To Verify
+reboot 

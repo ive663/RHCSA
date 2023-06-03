@@ -1,0 +1,66 @@
+ 
+Physical devices ; divides the physical volume into physical extents (PEs)
+Physical volumes(PVs)  ; combined size,
+Volume groups (VGs)
+Logical volumes(LVs)
+
+
+Creating Logical Volumes:
+#pvcreate /dev/vdb2 /dev/vdb1
+#vgcreate vg01 /dev/vdb2 /dev/vdb1
+#lvcreate -n lv01 -L 700M vg01 ; -L = -size
+#mkfs -t xfs /dev/vg01/lv01
+#mkdir /mnt/data
+
+#vi /etc/fstab
+/dev/vg01/lv01 /mnt/data xfs defaults 1 2
+systemctl daemon-reload
+#mount /mnt/data
+umount /mnt/data
+
+lvremove /dev/vg01/lv01
+vgremove vg01
+pvremove /dev/vdb2 /dev/vdb1
+
+pvdisplay /dev/vdb1
+vgdisplay vg01
+lvdisplay /dev/vg01/lv01
+
+Extending a Volume Group  :
+parted -s /dev/vdb mkpart primary 1027MiB 1539MiB
+parted -s /dev/vdb set 3 lvm on  (set type to Linux LVM)
+pvcreate /dev/vdb3
+
+vgextend vg01 /dev/vdb3
+vgdisplay vg01
+
+Reducing a Volume Group
+(back up data stored on all LVs in the VG)
+pvmove /dev/vdb3
+vgreduce vg01 /dev/vdb3
+
+Extending a Logical Volume and XFS/EXT4 File System :
+vgdisplay vg01 (check VG have space available)
+lvextend -L +300M /dev/vg01/lv01
+xfs_growfs /mnt/data   :  for xfs (mountpoint name)
+resize2fs /dev/vg01/lv01   :  for ext4 (lv name)
+
+df -h /mountpoint
+
+lvextend -l 128 : Resize the logical volume to exactly 128 extents in size (128 PEs x 4 MiB.
+lvextend -l +128 : Add 128 extents to the current size of the logical volume.
+lvextend -L 128M  : Resize the logical volume to exactly 128 MiB.
+lvextend -L +128M : Add 128 MiB to the current size of the logical volume.
+lvextend -l +50%FREE : Add 50 percent of the current free space in the VG to the LV.
+
+
+Extend a logical volume and swap space  :
+vgdisplay vgname : check vg free space
+swapoff -v /dev/vgname/lvname
+lvextend -l +extents /dev/vgname/lvname
+mkswap /dev/vgname/lvname
+swapon -va /dev/vgname/lvname
+
+
+Your system must have enough free memory or swap space to accept anything that
+needs to page in when the swap space on the logical volume is deactivated.

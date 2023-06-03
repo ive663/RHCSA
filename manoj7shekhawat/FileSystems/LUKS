@@ -1,0 +1,40 @@
+Question: Create 1 GB of Luks encrypted volume using device /dev/sdd
+		- Name should be mysecret mounted persistently on /secretdir
+		- Use the passphrase: Welcome@321
+		- Automate LuksOpen by default
+
+Solution:
+
+lsblk
+
+fdisk /dev/sdd
+
+lsblk
+
+cryptsetup luksFormat /dev/sdd1
+	- YES
+	- Welcome@321
+	- Welcome@321
+
+cryptsetup luksOpen /dev/sdd1 mysecret
+	- Welcome@321
+
+mkfs.xfs /dev/mapper/mysecret
+
+# To automate
+vim /etc
+	mysecret	/dev/sdd1	none
+
+mkdir /secretdir
+
+vim /etc/fstab
+	/dev/mapper/mysecret	/secretdir		xfs	defaults	0 0
+
+mount -a
+
+systemctl daemon-reload 
+
+df -h
+
+# Reboot to verify
+# Enter password when promted while system is booting

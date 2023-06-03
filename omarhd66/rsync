@@ -1,0 +1,41 @@
+
+rsync
+
+ua# mkdir ~/serverlogs
+ua# rsync -av root@10.0.2.15:/var/log  ~/serverlogs
+log/
+log/messages
+log/secure...
+ua#ls ~/serverlogs
+messages  secure  ...
+ub# ssh root@10.0.2.15  'logger "Log files sysnchronized"'
+
+ua# rync -av root@10.0.2.15:/var/log  ~/serverlogs
+log/messages 
+
+-----
+
+ua# mkdir ~/serverlogs
+ua# rsync -av root@10.0.2.15:/var/log/  ~/serverlogs
+messages
+secure...
+ua#ls ~/serverlogs
+
+
+# rsync -avNX root@10.0.2.15:/root/boot  ~/serverboot
+
+
+--
+Options Enabled with rsync -a (Archive Mode)
+OPTION DESCRIPTION
+-r, --recursive synchronize recursively the whole directory tree
+-l, --links synchronize symbolic links
+-p, --perms preserve permissions
+-t, --times preserve time stamps
+-g, --group preserve group ownership
+-o, --owner preserve the owner of the files
+-D, --devices synchronize device file
+If you are using advanced permissions, you might need to add two additional
+options:
+• -A to preserve ACLs
+• -X to preserve SELinux contexts

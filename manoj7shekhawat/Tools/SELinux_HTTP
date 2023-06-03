@@ -1,0 +1,19 @@
+Question: A HTTP web server running on non standard port 82 is having issues serving content. 
+
+          Debug and fix the issues.
+          i) The web server on your system can server all the existing HTML files from /var/www/html ( NOTE: Do not make any changes to these files ).
+          ii) Web service should automatically start at boot time.
+
+
+Solution:
+
+# Find the sealert messages
+grep -i sealert /var/log/messages
+
+# Copy the command from the logs
+seleart -l <HASH_CODE>
+
+# Run the suggested command given in the message of the above command
+
+# Finally enable httpd service
+systemctl enable --now httpd

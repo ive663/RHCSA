@@ -1,0 +1,57 @@
+Manage storage using the Stratis local storage management system 
+
+Managing Layered Storage with Stratis :
+
+#yum install stratis-cli stratisd
+#systemctl enable --now stratisd
+#stratis pool create pool1 /dev/vdb
+#stratis pool list
+#stratis pool add-data pool1 /dev/vdc
+#stratis pool list
+
+#stratis blockdev list pool1
+
+#stratis filesystem create pool1 fs1
+#stratis filesystem list
+#stratis filesystem snapshot pool1 fs1 snapshot1
+#stratis filesystem list  (it mention snap)
+
+
+#mkdir /mountpoint
+#mount /stratis/pool1/fs1 /mountpoint
+
+#lsblk --output=UUID /startis/pool1/f1
+	31b9363b-add8-4b46-a4bf-c199cd478c55
+#vi /etc/fstab
+UUID=31...55 /mountpoint  xfs defaults,xsystemd.requires=stratisd.service 0 0
+
+#mkdir /stratisvol-snap
+#mount /startis/pool1/snapshot1  /stratisvol-snap
+
+Create a 2 GiB file on fs1
+#dd if=/dev/urandom of=/mountpoint/file1 bs=1M count=2048
+#stratis filesystem list
+#tail /stratisvol-snap/file1
+
+#umount /stratisvol-snap
+#umount /mountpoint
+#stratis filesystem destroy pool1 snapshot1
+#stratis filesystem destroy pool1 fs1
+
+
+Therefore, the file system might appear to be 1 TiB in size, but might only have 100 GiB of
+real storage actually allocated to it from the pool.
+
+
+If you do not include the x-systemd.requires=stratisd.service mount
+option in /etc/fstab for each Stratis file system, the machine will fail to start
+properly and will abort to emergency.target the next time it is rebooted.
+
+The df command will report that any new Stratis-managed XFS file systems are
+1 TiB in size, no matter how much physical storage is currently allocated to the
+file system.
+
+Stratis-managed file systems are formatted using XFS.
+you can create up to 224 file systems per pool.
+
+In Stratis, file systems are built from shared pools of disk devices using a concept known as thin-provisioning.

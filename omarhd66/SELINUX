@@ -1,0 +1,139 @@
+SELINUX file context
+
+samedi 2 octobre 2021
+11:37
+
+
+Changing selinux enforcement mode:
+
+#getenforce
+
+#vim /etc/selinux/config
+
+SELINUX=permissive
+SELINUXTYPE=tartgeted
+
+#systemctl reboot
+
+#getenforce
+#vim /etc/selinux/config
+SELINUX=enforcing
+
+#setenforce 0
+#setenforce 1
+#getenforce
+
+================
+Controlling selinux file context :
+
+#yum -y yum install policycoreutils policycoreutils-python
+#mkdir /costum
+#echo "this is from /custom/html.intex" > /custom/html.intex
+
+#vim /etc/httpd/conf/httpd.conf
+DocumentRoot "/custom" (au lieu /var/www/html)
+<Directory "/custom">
+
+#systemctl enable --now httpd
+#systemctl status hettpd
+#curl http://monit/index.html  (default_t)
+	error
+#semanage 
+#semanage fcontext -a -t httpd_sys_content_t '/custom(/.*)?'
+#restorecon -Rv /custom  (need restorecon to change have effect on /cust)
+#curl http://monit/index.html  
+	this is from /custom/html.intex
+
+#chcon -t default_t /custom  (immediat effect)
+#chcon -t default_t /custom/index.html 
+#curl http://monit/index.html  (default_t con)
+	error (without resotore)
+
+#setenforce 0  (immediat effect)
+#curl http://monit/index.html  (default_t con)
+	this is from /custom/html.intex
+#setenforce 1
+#curl
+	error
+
+==================
+Adjusting selinux policy with booleans :
+
+as root
+#vim /etc/httpd/conf.d/userdir.conf
+	#UserDir disabled
+	UserDir public_html
+#systemctl enable --now httpd
+
+as consul1
+#mkdir ~/public_html
+#echo "this is consul1 content on MONIT host.' > ~/public_html/index.html
+#chmod 711 ~
+#curl http://localhost/~consul1/index.html
+	error
+#getsebool -a | greep homedir
+  -->off
+#setsebool -P http_enable_homedirs on
+#curl ..
+	this is consul1 content on MONIT host
+	
+======================
+Investigation and resolving selinux issues :
+
+#touch /root/file3
+#mv /root/file3  /var/www/httl
+#systemctl start httpd
+#curl http://localhost/file3
+	error
+#tail /var/log/audit/auditlog
+#tail /var/log/messages
+	?alert about selinux?
+#dnf install setroubleshoot-server
+#curl http://localhost/file3
+#tail /var/log/messages
+	...sealert -l 432...
+
+#sealert -l uuid
+  #ausearch -c 'httpd' --raw | audit2allow -M My-http
+  (#grep httpd /var/log/audit/audit.log | audit2allow..)
+  #semodule -i My-http.pp
+
+#restorecon /var/www/http
+#curl http://localhost/file3
+	ok
+#ausearch -m AVC -ts recent
+
+
+
+SELINUX port lable
+
+dimanche 3 octobre 2021
+12:50
+
+If you decide to run a service on a nonstandard port, SELinux almost certainly will block the traffic.
+In this case, you must update SELinux port labels. In some cases, the targeted policy has already
+labeled the port with a type that can be used
+
+#yum -y install policycoreutils policycoreutils-python
+
+semanage port -l | grep http
+	port 6666 not in the list
+vi /etc/httpd/conf/httpd.conf
+	Listen 6666
+systemctl restart httpd
+	failed / port not allowend by selinux
+journalctl -xe
+	needs to add 6666 on the list allowed by selinux
+ semanage port -a -t http_cache_port_t -p tcp 6666
+semanage port -l -C
+systemctl restart httpd
+ curl -k http://localhost:6666/index.html
+
+semanage port -d -t ssh_port_t -p tcp 44
+semanage port -a -t gother_port_t -p tcp 71
+semanage port -m -t http_port_t -p tcp 71
+semanage port -l -C
+
+setsebool -P nis_enabled 1
+systemctl restart httpd
+

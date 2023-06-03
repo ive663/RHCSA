@@ -1,0 +1,10 @@
+Configure your Host Name, IP Address, Gateway and DNS to the Following
+
+
+hostname:	abc.com
+
+IP Address:	172.24.40.40/24
+
+Gateway:	172.24.40.1
+
+DNS:		172.24.40.1

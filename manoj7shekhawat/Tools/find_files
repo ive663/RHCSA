@@ -1,0 +1,7 @@
+Question: Find all files owner by user natasha and copy in /root/findresults
+
+Solution:
+
+mkdir -p /root/findresults
+
+find /* -type f -user natasha -exec cp {} /root/findresults \;

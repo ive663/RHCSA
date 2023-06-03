@@ -1,0 +1,124 @@
+Managing Partitions with Parted for both the MBR and the GPT partitioning scheme.
+
+#parted /dev/vda print
+#parted /dev/vda
+	type print
+	type quit
+# parted /dev/vda unit s print
+	s for sector
+	B for byte
+	MiB, GiB, or TiB (powers of 2)
+	MB, GB, or TB (powers of 10)
+
+parted /dev/vdb mklabel msdos  (write an MBR disk label to a disk)
+parted /dev/vdb mklabel gpt   (write a GPT disk label)
+
+
+Creating MBR Partitions :
+# parted /dev/vdb help mkpart
+# parted /dev/vdb
+(parted) mkpart
+Partition type? primary/extended? primary
+File system type? [ext2]? xfs
+Start? 2048s
+End? 1000MB
+(parted) quit
+
+#udevadm settle
+
+#parted /dev/vdb mkpart primary xfs 2048s 1000MB
+
+Creating GPT Partitions :
+#parted /dev/vdb
+(parted) mkpart
+Partition name? []? usersdata
+File system type? [ext2]? xfs
+Start? 2048s
+End? 1000MB
+(parted) quit
+
+#udevadm settle
+
+parted /dev/vdb mkpart usersdata xfs 2048s 1000MB
+----
+
+
+mkfs.xfs /dev/vdb1
+mkfs.ext4 /dev/vdb1
+
+
+mount   /dev/vdb1   /mnt
+mount | grep vdb1
+
+lsblk  -fp
+lsblk --fs   ; lsblk --fs /dev/vdb
+	vda1 xfs a8063676-44dd-409a-b584-68be2c9f5570
+cat /etc/fstab
+	UUID=a8063676-44dd-409a-b584-68be2c9f5570 /mnt xfs defaults 0 0
+mount /mountpoint or findmnt --verify (mount -a)
+systemctl daemon-reload
+
+Deleting Partitions :
+#parted /dev/vdb
+(parted) print
+(parted) rm 1
+(parted) quit
+
+===SWAP
+#parted /dev/vdb
+	arted) print
+	parted) mkpart
+	Partition name? []? swap1
+	File system type? [ext2]? linux-swap
+	Start? 1001MB
+	End? 1257MB
+	(parted) print
+	(parted) quit
+
+# parted /dev/vdb mkpart myswap linux-swap 1001MB 1501MB
+
+#udevadm  settle
+
+#mkswap /dev/vdb2
+
+#free
+	swap : 0
+#swapon --show
+#swapon /dev/vdb2
+#swapon --show
+#free
+	swap  : 249852
+#lsblk --fs /dev/vdb2
+
+#vi /etc/fstab
+UUID=39e2667a-9458-42fe-9665-c5c854605881 swap swap defaults 0 0
+
+#systemctl daemon-reload
+
+#swapoff /dev/vdb2
+#swapon --show
+
+#swapon -a
+
+Setting the Swap Space Priority :
+#vi /etc/fstab
+UUID=39e2667a-5881 swap swap pri=4 0 0 (second)
+UUID=fbd7faef572bf swap swap pri=10 0 0 (fisrt untill full)
+##if pri are equals the kernel writes to them in a round-robin fashion
+
+=====================================================================
+MBR Partitioning Scheme   data is stored as 32-bit values,  maximum disk and partition size of 2 TiB. single point of failure,
+
+GPT Partitioning Scheme   maximum of 128 partitions.  allocates 64 bits for logical block addresses.  partitions and disks of up to eight zebibytes (ZiB) or eight billion tebibytes.  GPT offers redundancy of its partition table information.
+
+
+Because the partition starts at the sector 2048, the previous command sets the end
+position to 1001MB to get a partition size of 1000MB (1 GB).
+
+Keep in mind that parted makes the changes immediately. A mistake with parted
+could lead to data loss.
+The mklabel subcommand wipes the existing partition table. Only use mklabel
+when the intent is to reuse the disk without regard to the existing data. If a new
+label changes the partition boundaries, all data in existing file systems will become
+inaccessible.
+

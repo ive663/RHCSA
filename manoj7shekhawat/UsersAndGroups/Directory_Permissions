@@ -1,0 +1,12 @@
+Question: Create a Shared Directory /home/admins, make it has the following characteristics:
+          /home/admins belongs to group admingrp
+          This directory can be read/write by members of group adminuser. Any files created in /home/ admin, group automatically set as adminuser.
+          And others do not have any other permissions on the directory.
+          
+Solution:
+
+mkdir -p /home/admins
+
+chown :admingrp /home/admins
+
+chmod 2770 /home/admins

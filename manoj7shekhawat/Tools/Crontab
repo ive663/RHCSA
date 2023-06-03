@@ -1,0 +1,17 @@
+Question: Create a crontab for a new user natasha that runs at 14:23 everyday and executes /bin/echo hello
+
+
+Solution:
+
+# Switch to natasha user
+
+su - natasha
+
+crontab -e
+
+	23 14 * * * /bin/echo hello
+
+
+# verify
+
+crontab -l

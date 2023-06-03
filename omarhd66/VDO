@@ -1,0 +1,26 @@
+Compressing and Deduplicating Storage with VDO 
+use VDO volumes to optimize storage space in use
+
+#yum install vdo kmod-kvdo
+#yum list installed vdo
+
+#vdo create --name=vdo1 --device=/dev/vdd --vdoLogicalSize=50G
+#vdo list
+#vdo status --name=vdo1
+#vdo status --name=vdo1 | grep -E 'Deduplication|Compression'
+	Compression: enabled
+	Deduplication: enabled
+#udevadm settle
+
+#mkfs.xfs -K /dev/mapper/vdo1
+#mkdir /mnt/vdo1
+#mount /dev/mapper/vdo1 /mnt/vdo1
+#mount | grep vdo1
+
+Verify the data deduplication and compression :
+#vdostats --human-redable
+#cp /root/install.img /mnt/vdo1/install.img.1
+#vdostats --human-readable
+#cp /root/install.img /mnt/vdo1/install.img.2
+#cp /root/install.img /mnt/vdo1/install.img.3
+#vdostats --human-readable

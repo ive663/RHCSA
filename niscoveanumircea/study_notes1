@@ -1,0 +1,657 @@
+### 1. Deploy, configure, and maintain systems
+
+* Check current configuration:
+   `$ systemctl get-default`
+* Change the current target:
+   `$ systemctl isolate name.target`
+* Set the default configuration
+  `$ systemctl set-default name.target`
+* Change target to rescue mode:
+   `$ systemctl rescue`
+* View targets: 
+```
+$ ll /etc/systemd/system/default.target
+      /etc/systemd/system/default.target -> /lib/systemd/system/graphical.target
+```
+```
+$ ll /lib/systemd/system/runlevel*.target
+
+    lrwxrwxrwx. 1 root root 15 Feb  4 17:01 /lib/systemd/system/runlevel0.target -> poweroff.target
+    lrwxrwxrwx. 1 root root 13 Feb  4 17:02 /lib/systemd/system/runlevel1.target -> rescue.target
+    lrwxrwxrwx. 1 root root 17 Feb  4 17:01 /lib/systemd/system/runlevel2.target -> multi-user.target
+    lrwxrwxrwx. 1 root root 17 Feb  4 17:01 /lib/systemd/system/runlevel3.target -> multi-user.target
+    lrwxrwxrwx. 1 root root 17 Feb  4 17:01 /lib/systemd/system/runlevel4.target -> multi-user.target
+    lrwxrwxrwx. 1 root root 16 Feb  4 17:01 /lib/systemd/system/runlevel5.target -> graphical.target
+    lrwxrwxrwx. 1 root root 13 Feb  4 17:01 /lib/systemd/system/runlevel6.target -> reboot.target
+```
+#### YUM / DNF
+
+`$ yum-config-manager --add-repo https://dl.fedoraproject.org/pub/epel/8/Everything/x86_64/`
+
+##### YUM Appstream
+
+* List modules: 
+
+`$ yum module list` - shows all versions for each module
+
+* Enable another version: 
+
+`$ yum module enable postgresql:12`
+	
+* Reset module version to default [d]: 
+
+`yum module reset postgresql` 
+	
+* Other yum module arguments : 
+
+`$ yum module {update,provides,install,reset,disable,enable,info,remove,list} MODULE_NAME`
+   
+* List modules: `$ dnf|yum module list`.
+* Enable/disable module: `$ dnf|yum module enable|disable postgresql:12`.
+* Install/reset module: `$ dnf|yum module reset|install`.
+
+##### YUM Create Local Repository
+
+The ISO image used for installing Linux contains packages.
+
+`/dev/sr01`- device used by DVD ROM
+
+Create a local ISO using the DVD ROM content
+
+`dd if=/dev/sr0 of=/rhel8.iso bs=1M`
+
+Mount the ISO permanently to a mountpoint:
+
+```
+$ cat /etc/fstab
+/rhel8.iso     /repo     iso9660     defaults   0 0
+```
+
+
+`$ cat /etc/yum.repos.d/local.repo`
+
+```
+[local_repo_name]
+
+name = It is like a description
+baseurl = file:///repo/path/to/dir/with/packages
+enabled = 1
+gpgcheck = 1
+gpgkey = file:///repo/path/to/dir/with/packages/RPM-KEY  ( or stored in /etc/pki/rpm-gpg )
+```
+
+
+##### YUM Other Commands
+
+* List packages from a repository: `$ dnf|yum repository-packages epel list`.
+
+`$ yum updateinfo all`
+
+* Install GUI|Graphical Interface:
+
+```
+   $ yum grouplist
+   $ yum groupinstall "Graphical Administration Tools|Server with GUI"
+   ```
+
+#### Updating KERNEL
+
+      ```
+      $ yum clean all
+      $ yum list kernel
+      $ yum install kernel
+      ```
+      
+OR using RPM
+
+   `$ rpm -ivh kernel-3.10.0-327.4.5.el7.x86_64.rpm`
+   
+The name of your kernel package may vary. At this point you may realize, upon running the above command, you receive an error relating to failed dependencies. To resolve this, we need to update our `linux-firmware` and `dracut` packages:
+
+`$ yum install linux-firmware dracut`
+
+With the dependencies resolved, rerun the installation command. If you now **navigate to the /boot directory, you can view the newest kernel installed under vmlinuz-3.10.0327.4.5.el7.x86_64. You can also see the older kernel located alongside it. If vmlinuz-3.10.0-327.4.5.el7.x86_64 is not located in the /boot directory, run dracut to regenerate it for the latest kernel.**
+
+```
+ls -1  /boot/*vmlinuz*
+/boot/vmlinuz-3.10.0-1062.1.2.el7.x86_64
+/boot/vmlinuz-3.10.0-1062.4.3.el7.x86_64
+/boot/vmlinuz-3.10.0-1062.7.1.el7.x86_64
+```
+
+Ensure the new kernel is installed by rebooting the system and once more running the `uname -r` command. It should output the version number of the newly-downloaded kernel.
+
+```
+$ yum updateinfo all
+
+Last metadata expiration check: 0:11:40 ago on Thu 20 Feb 2020 10:50:49 PM CET.
+Updates Information Summary: all
+    3 New Package notice(s)
+    1 Security notice(s)
+        1 Low Security notice(s)
+    1 Bugfix notice(s)
+    2 other notice(s)
+```
+
+### 2. Manage basic networking
+
+#### DNS
+
+cat /etc/resolv.conf
+cat /etc/hosts
+
+or to change the resolv order : 
+
+`/etc/nsswitch.conf` + systemclt network restart
+
+
+##### RUNTIME configurations
+
+`$ ip` -> used only for **RUNTIME** configuration ( not persistent )
+
+`$ ip link show` - show status of current NIC
+`$ ip route` - show and manage routes
+`$ ip address show` - manage address assignment
+`$ ip link IF up|down
+`
+##### PERSISTENT configurations
+
+CLI: `nmcli`
+GUI: `nmtui`    
+
+`$ system start/enable NetworkManager`
+
+* Show connections | configurations:
+
+```
+# cat /etc/sysconfig/network-scripts/ifcfg-ens33
+```
+or
+```
+$ nmcli connection show
+NAME   UUID                                  TYPE      DEVICE
+ens33  1a883146-2c88-43ea-ab1b-d9c3e23a87d0  ethernet  ens33
+```
+
+* Creating an ethernet connection profile:
+
+
+`$ nmcli connection add con-name testcont autoconnect no type ethernet ifname ens33` -> the connection 'testcon' is created, but is DOWN
+
+```
+$ nmcli connection  show
+NAME         UUID                                  TYPE      DEVICE
+System eth0  5fb06bd0-0bb0-7ffb-45f1-d6edd65f3e03  ethernet  eth0
+testcont     7e766c87-2230-40b5-b28e-cc4e93a0c33b  ethernet  --
+```
+* To make the connection UP:
+
+`$ nmcli connection up testcon`
+
+
+
+Show devices | interfaces:
+```
+# nmcli device status
+DEVICE  TYPE      STATE      CONNECTION
+ens33   ethernet  connected  ens33
+lo      loopback  unmanaged  --
+```
+
+* If you modify the network config file you need to make sure it is reloaded:
+
+1. `$ nmcli connection up`
+2. `$ systemctl restart NetworkManager.service`
+
+
+
+
+
+### 4. Configure local storage
+
+MBR - supports 4 partions -> `$ fdisk`.
+
+GBT - unlimited partitions and more disk size -> `$ gdisk`.
+
+EXT:
+
+`$ resize2fs` -> resize ext2/ext3/ext4 filesystems
+
+`$ xfs_growfs` -> resize xfs filesystems
+
+XFS:
+
+`$ tune2fs` -> configures ext filesystems / label / UUID etc etc
+
+`$ xfs_admin` -> configures xfs filesystems / label / UUID etc etc
+
+### 5. Create and configure file systems
+
+#### SAMBA
+
+[server]
+```
+$ yum install -y samba
+$ vi /etc/samba/smb/conf - edit config
+$ systemctl start smb - start samba service
+$ useradd samba_user - add a new linux user for samba
+$ smbpasswd -a samba_user
+```
+
+[client]
+```
+$ yum install -y samba-client cifs-utils
+$ mount -t cifs //server_ip/samba_shared_dir /mnt/samba_mountpoint -ousername=samba_user,password=samba_password
+```
+
+The files written on the client with any user will appear on the server in the ownership of the user "samba_user".
+
+#### Network File System
+[server]
+
+```
+$ yum install nfs-utils
+$ systemctl start rpcbind
+$ systemctl start nfs-server
+```
+
+cat /etc/exports: 
+
+`/nfs-share-directory   CLIENT_IP(*,rw,sync, permissions etc)` 
++ 
+`$ exportfs -a`  - to export al exports in file
+
+[client]
+
+```
+$ yum install -y nfs-utils
+$ systemctl start rpcbind.service
+```
+
+Show file system exports on the client: 
+
+`$ showmount -e SERVER_IP`
+
+**Mounting the NFS on client**
+
+```
+$ mount -t nfs SERVER_IP:/nfs-share /mounted-nfs-share	
+
+$ vi /etc/fstab : 
+
+SERVER_IP:/nfs-share       /mounted-nfs-share      nfs4    defaults 0 0
+```
+
+### 6. Manage users and groups
+
+`$ chage` - set password aging
+`$ authconfig --minpasslength X` - set min password length
+
+or
+
+file `/etc/security/pwquality.conf`- set password configuration
+
+`$ passwd -e [user]` - force expire password
+
+### 7 RHCSA 8 Updates
+
+#### Adjust Process Priorities
+
+Priority is specified in **NI** column.
+
+```
+   PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+  5966 root      20   0       0      0      0 I   0.3   0.0   0:03.22 kworker/0:1-events_power_efficient
+  7187 root      20   0   63912   4304   3616 R   0.3   0.5   0:00.02 top
+```
+
+`$ nice` - sets priority when starting processes
+
+Set process priority to : 5
+
+`$ nice 5 cat /dev/urandom > /dev/null &`
+
+```
+   PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+  7235 root      25   5    7420   1940   1724 R  98.3   0.2   2:30.32 cat /dev/urandom
+  5966 root      20   0       0      0      0 I   0.3   0.0   0:03.48 [kworker/0:1-xfs-cil/dm-0]
+```
+
+For process that already started:
+
+`$ renice -n PRIORITY -p PID`
+
+
+#### Persistent journals
+
+Normally, `journald` journals don't persist through reboots.
+
+Enable persistence:
+```
+$ mkdir /var/logs/journal
+$ systemctl restart system-journald.service
+```
+
+
+#### Working with Virtual Data Optimizer (VDO)
+
+* Install required package: 
+
+```
+$ yum install vdo kmod-kvdo
+$ systemctl start vdo.service
+```
+
+* Create a VDO volume:
+
+`$ vdo create --name=vdo_volume_1 --device=/dev/devName --vdoLogicalSize=vol_size`
+
+vdoLogicalSize - 10 times the disk space if used for storage for VMs / containers
+
+vdoLogicalSize -  3 times the disk space if used for other purposes: web / databases etc
+
+* View information on vdo volumes:
+
+```
+$ vdostats --human-readable
+$ vdo status --name=VDO_NAME
+```
+
+* For creating filesystems on top of VDO , we need to make use **DON'T DISCARD BLOCKS** option:
+
+```
+$ mkfs.xfs -K /dev/mapper/VDO_NAME
+$ mkfs.ext4 -E nodiscard /dev/mapper/VDO_NAME
+
++
+
+$ udevadm settle -> to make sure the system registers the new device node
+```
+
+* Resize VDO:
+
+```
+$ vdo growPhysical --name=vdo_volume_1 ( after extending an underlaying LVM for example )
+$ vdo growLogical --name=vdo_volume_1 --vdoLogicalSize=New_vol_size
++
+$ xfs_growfs /dev/mapper/vdo_volume_1  or 
+$ resize2fs /dev/mapper/vdo_volume_1
+```
+
+and check:
+
+`$ vdostats --human-readable`
+
+* Mounting persistent filesystem using VDO:
+
+Need to add some extra flags. Before the actual mount, vdo service and others must first start
+
+```
+$ cat /etc/fstab
+/dev/mapper/NAME  /mount/point   FS_TYPE(xfs,ext etc)    x-systemd.requires=vdo.service    0 0  
+```
+
+
+#### Adjust Real Time Process Priorities (chrt)
+
+`$ chrt`
+
+#### AutoFS 
+
+[client]
+```
+$ yum install -y autofs
+$ systectm start autofs.service
+```
+
+Create auto.master file (similar to /etc/auto.master):
+
+```
+$ vi /etc/auto.master.d/auto.master
+/nfs /etc/auto.nfs
+```
+
+`/etc/auto.nfs` - is the map file; can have any name
+
+
+```
+$ auto -rw,soft,intr NFS_SERVER_IP:/NFS_SHARE_PATH
++
+$ systemctl restart autofs.service
+```
+
+### Interrupt boot process and Change the root password:
+
+* Edit the kernel boot parameters by pressing "`e`"
+* Go to the end of "linux" line by pressing `CTR+e` removing `ro crash` and add `rd.break enforcing=o`
+* Start the system by pressing `CTR+x`
+* Remount the root of the system: 
+
+  `$ mount -o remount,rw /sysroot`
+  
+* Swith to /sysroot: `$ chroot /sysroot`
+* Reset the “root” password: `$ passwd`
+* Enable SElinux relabeling: `$ touch /.autorelabel`
+* Exit the SHELL:   ```$ exit```
+
+
+### Special permissions:
+
+* `setuid`  (only to files ) – when running the executable, it runs with the owner permission and not with the actual user that runs the executable
+* `setgid` (files and folders) – if set , the files/folders created under the parent will have the group of the of the parent folder
+* `sticky bit` (folders) – if set , the files under folder can only be deleted by the owner
+
+
+### Configure time service client : chrony
+
+* Install required package: `yum install chrony`
+* Start "chronyd": `systemctl start chronyd && systemctl enable chronyd`
+* Configure "chronyd": `vi /etc/chronyd`
+* Restart "chornyd" to apply configuration: `systemctl restart chronyd`
+
+### Users and Groups
+
+`$ id USER_NAME`
+
+`$ groups USER_NAME` -> show belonging groups
+
+`$ usermod -aG NEW_GROUP_TO_ADD USER_NAME` - add the user to a new group
+
+`$ usermod -g NEW_MAIN_GROUP USER_NAME` - sets the new main group
+
+`$ usermod -L USER_NAME` - lock user
+
+`$ usermod -U USER_NAME` - unlock user
+
+* Change password to user:
+
+`$ passwd USER_NAME` - to change password for user
+
+`$ chage USER_NAME` - to set password expiracy policies
+
+### SElinux 
+
+`$ getenforce` - view selinux mode [0|1] or [Permissive|Enforcing]
+
+`$ setenforce [0|1]` - set selinux mode
+
+`$ setatus` - view SElinux status
+
+* List boolenas: `$ getsebool -a`
+* Turn boolean ON of OFF: `$ setsebool BOOLEAN_NAME on | off -P` - add "-P" for permanent
+* List SElinux contexts: `$ semanage fcontext -l`
+* View contexts on files of folders:
+
+```
+	$ ls -Z
+	$ ps -axZ
+```
+
+* Persistent Changes: semanage fcontext
+
+The `semanage fcontext` command is used to change the SELinux context of files. To show contexts to newly created files and directories, enter the following command as root:
+
+`$ semanage fcontext -C -l`
+
+* Change SElinux context (semanage or chcon or setfiles):
+
+	`$ semanage fcontext -a -t context_type '/var/www/html(./*)?'` - changes SElinux context recurrent
+	
+	or
+	
+	`$ setfiles ...`
+	
+	or
+	
+	`$ chcon ...`
+	
+* Restore default contexts: `$ restorecon -R /var/www/html`
+
+* View SElinux policy violations:
+	
+	`$ seaalert -a /var/log/audit/audit.log`
+
+
+### Adjust process scheduling
+
+ All Linux threads have one of the following scheduling policies:
+
+**SCHED_OTHER** or **SCHED_NORMAL**: The default policy; normal time sharing
+**SCHED_BATCH**: Similar to SCHED_OTHER, but with a throughput orientation
+**SCHED_IDLE**: A lower priority than SCHED_OTHER
+**SCHED_FIFO**: A first in/first out realtime policy
+**SCHED_RR**: A round-robin realtime policy 
+
+`SCHED_OTHER` or `SCHED_NORMAL` is the default scheduling policy for Linux threads. It has a dynamic priority that is changed by the system based on the characteristics of the thread. Another thing that effects the priority of `SCHED_OTHER` threads is their nice value. The nice value is a number between -20 (highest priority) and 19 (lowest priority). By default, `SCHED_OTHER` threads have a nice value of 0. Adjusting the nice value will change the way the thread is handled.
+
+Threads with a `SCHED_FIFO` policy will run ahead of `SCHED_OTHER` tasks. Instead of using nice values, `SCHED_FIFO` uses a fixed priority between 1 (lowest) and 99 (highest). A `SCHED_FIFO` thread with a priority of 1 will always be scheduled ahead of any `SCHED_OTHER` thread.
+
+The `SCHED_RR` policy is very similar to the `SCHED_FIFO` policy. In the SCHED_RR policy, threads of equal priority are scheduled in a round-robin fashion. Generally, `SCHED_FIFO` is preferred over `SCHED_RR`.
+
+`SCHED_FIFO` and `SCHED_RR` threads will run until one of the following events occurs:
+
+*The thread goes to sleep or begins waiting for an event
+A higher-priority realtime thread becomes ready to run*
+
+If one of these events does not occur, the threads will run indefinitely on that processor, and lower-priority threads will not be given a chance to run. This can result in system service threads failing to run, and operations such as memory swapping and filesystem data flushing not occurring as expected. 
+
+
+```
+   PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+ 24529 root      20   0    7324    828    760 R  82.4   0.0   0:01.96 dd
+```
+
+```
+$ chrt -p 24529
+pid 24529's current scheduling policy: SCHED_OTHER
+pid 24529's current scheduling priority: 0
+```
+
+```
+$ chrt -m
+SCHED_OTHER min/max priority    : 0/0
+SCHED_FIFO min/max priority     : 1/99
+SCHED_RR min/max priority       : 1/99
+SCHED_BATCH min/max priority    : 0/0
+SCHED_IDLE min/max priority     : 0/0
+SCHED_DEADLINE min/max priority : 0/0
+
+```
+
+To start a new application with a given policy and priority, specify the name of the application (and the path, if necessary) along with the attributes. 
+The following command will start `/bin/my-app`, with a policy of `SCHED_FIFO` and a priority of `36`:
+
+`$ chrt -f 36 /bin/my-app`
+
+
+### Adjust process priority/nice level
+
+Another important task for the system administrator is managing priorities and niceness. Well, by default Linux processes are started with the same priority. 
+
+**Real-Time (rt)** processes - highest priority and cannot be modified by no one
+**Non Real-Time** processes - can have their priorities changed with `nice / renice` and `chrt` and `top (r)`
+
+When you use nice and renice, you use a nice value, and the nice value ranges from **-20 (highest) to positive 19 (lowest)**
+As a USER, you can only reduce priority of the processes;
+
+```
+nice -n 10 (nice value)     /bin/bash command etc
+renice -n 10 (nice valie)   -p PID
+```
+
+The library calls below are used to set the priority of non-realtime processes.
+
+```
+nice
+getpriority
+setpriority 
+```
+
+These functions retrieve and adjust the nice value of a **non-realtime process**. The nice value serves as a suggestion to the scheduler on how to order the list of ready-to-run non-realtime processes to be run on a processor. 
+The processes at the head of the list run sooner than the ones further back. 
+
+### Manage tuning profiles
+
+`tuned` - service that allows performance optimization
+
+```
+$ systemctl enable tuned.service
+$ systemctl start tuned.service
+```
+
+$ tuned-adm list 			- show list of profiles
+$ tuned-adm profie <new-profile> 	- sets new profile
+$ tuned-adm active			- show current profile
+
+
+### Manage layered storage: STRATIS
+
+* Not created on top of partitions
+* Can be created on top of disks or LVM
+* Default filesystem: XFS
+
+#### How To Use STRATIS
+
+```
+$ yum install -y stratis-cli startisd
+$ systemctl enable stratisd
+$ systemctl stratis stratisd
+```
+
+* Create a STRATIS pool and filesystem
+
+```
+$ stratis pool create MYPOOL /dev/sdb
+$ stratis pool  list 	- show pools
+
+$ stratis filesystem create MYPOOL my_fs1 ( creates XFS filesystem )
+$ stratis filesystem list 	- show filesystems
+```
+
+```
+$ mkdir /mount_dir
+$ mount /dev/stratis/MYPOOL/my_fs1 /mount_dir
+```
+
+* Show info
+
+$ stratis fs list
+$ stratis blockdev list MYPOOL 	
+
+* Persistent mount : fstab
+
+```
+$ vi /etc/fstab
+UUID=71c5b986-be31-46b1-bbb9-563641ad4820 /mount_dir 	xfs		defaults 	0 0
+```
+
+
+### SSH
+
+AllowUsers
+AllowGroups 
+
+DenyUsers
+DenyGroups
+
+`$ systemctl restart sshd.service`

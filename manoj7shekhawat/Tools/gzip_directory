@@ -1,0 +1,18 @@
+Question: Compress a directory (/usr/share/doc) using gzip utility with name: archive.tgz. We should be able to un-compress it with gzip
+
+Solution:
+
+tar cvf - /usr/share/doc | gzip > archive.tgz
+
+gzip -d archive.tgz 
+
+tar -xvf archive.tar
+
+
+Question: Create a backup file named /root/backup.tar.bz2, which contains the contents of /usr/local in /root/test directory, tar must use the bzip2 compression.
+
+Solution:
+
+mkdir -p /root/test
+
+tar -jcvf backup.tar.bz2 /usr/local -C /root/test

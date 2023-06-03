@@ -1,0 +1,76 @@
+Question: Create a container with the name, "logserver" from rhel8/rsyslog image from registry.lab.example.com registry.
+          - Configure the container with systemd services as the mshekhawat user using the service name, "container-logserver" 
+                    so that it can be persistent across reboot.
+          - Configure your host journal to store all journal across reboot copy all journal form /var/log/journal and all subdirectories to 
+                    /home/mshekhawat/container-logserver.
+          - Create and mount /home/mshekhawat/container-logserver as a persistent storage to the container as /var/log/journal when container start
+          - Use "administrator" as the username and "admin123" as the credentials for the image registry. 
+          - Use mshekhawat as mshekhawat's password. No root password is needed because wallah is a sudo user.
+          
+          
+Solution:
+
+# check if needed module is installed
+yum module list --installed | grep container
+
+yum module install container-tools
+
+# make directory and copy files
+mkdir -p /home/mshekhawat/container-logserver
+
+# check if systemd-journald is running properly
+su -
+
+mkdir -p /var/log/journal
+
+systemctl restart systemd-journald
+
+systemctl status systemd-journald
+
+exit
+# copy files
+cd /home/mshekhawat/container-logserver
+
+cp -r /var/log/journal .
+
+# change ownership
+chown -R mshekhawat:mshekhawat /home/mshekhawat/container-logserver
+
+# Download image
+podman login registry.redhat.io
+
+podman pull registry.redhat.io/rhel8/rsyslog
+
+# run container
+podman run -d --name logserver -v /home/mshekhawat/container-logserver:/var/log/journal:Z registry.redhat.io/rhel8/rsyslog
+
+# Verify it is running
+podman ps
+
+# Check the linger state
+loginctl show-user mshekhawat
+
+# Enable linger for user
+loginctl enable-linger mshekhawat
+
+# Verify Linger=yes for mshekhawat
+loginctl show-user mshekhawat
+
+# Create user systemd directory
+mkdir -p .config/systemd/user
+
+cd .config/systemd/user
+
+# Generate service file
+podman generate systemd --name logserver --files
+
+# enable user container service
+systemctl --user enable container-logserver.service
+
+# reload daemon
+systemctl --user daemon-reload
+
+# reboot to verify that container is still up after rebooting
+reboot
+
+podman ps
