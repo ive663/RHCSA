@@ -21,7 +21,7 @@ the collection of practice questions and lab environment for ex200 from all arou
 
 ---
 
-[Vagrant Lab Enviroment Setup](VagrantPlayground/README.md) <-- Work in process. NOT working yet... 
+[Vagrant Lab Enviroment Setup](VagrantPlayground/README.md)
 
 ---
 
