@@ -1,8 +1,9 @@
 
 # RHCSA/RHCE Lab Environment
 
-# Playground
+NOTE: VM's are empty inside... it's just playground enviroment to train...
 
+---
 ## VirtualBox flavor.
 
 >  `cd VangartPlayground/virtualbox/` 
