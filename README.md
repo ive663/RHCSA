@@ -19,6 +19,7 @@ the collection of practice questions and lab environment for ex200 from all arou
   </p> -->
 </p>
 
+---
 
 [Vagrant Lab Enviroment Setup](VagrantPlayground/README.md)
 
@@ -26,7 +27,6 @@ the collection of practice questions and lab environment for ex200 from all arou
 
 [**Red Hat Certified System Administrator (RHCSA)** exam objectives](https://www.redhat.com/en/services/training/ex200-red-hat-certified-system-administrator-rhcsa-exam?section=objectives)
 
----
 
 **Study points for the exam**
 
@@ -121,3 +121,23 @@ RHCSA exam candidates should be able to accomplish the tasks below without assis
 - Configure a container to start automatically as a systemd service
 - Attach persistent storage to a container
 - As with all Red Hat performance-based exams, configurations must persist after reboot without intervention.
+
+---
+
+**Sources for original repositories:**
+
+- [Abdulhamid97Mousa](https://github.com/Abdulhamid97Mousa) - https://github.com/Abdulhamid97Mousa/RHCSA-EX200
+- [chlebik](https://github.com/chlebik) - https://github.com/chlebik/rhcsa-practice-questions
+- [manoj7shekhawat](https://github.com/manoj7shekhawat) - https://github.com/manoj7shekhawat/rhcsa
+- [Mircea Niscoveanu](https://github.com/niscoveanumircea) - https://github.com/niscoveanumircea/RHEL8_exam_documentations
+- [omarhd66](https://github.com/omarhd66) - https://github.com/omarhd66/RHCSA-EX200-RESUME
+- [SHrEE-7](https://git.codeproxy.net/SHrEE-7) - https://github.com/SHrEE-7/RHCSA_RHEL-8_With-Practice-Questions
+- [SpringEp](https://github.com/SpringEp) - https://github.com/SpringEp/RHCSA8-labs-exams-scripts
+- [touhidece](https://github.com/touhidece) - https://github.com/touhidece/rhcsa_ex200_rhel8_dumps
+---
+
+**MIT License**
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
+**Copyright (c) 2023**
