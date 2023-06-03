@@ -5,7 +5,9 @@
 
 ## VirtualBox flavor.
 
->  `cd playground/virtualbox/` and follow this guide
+>  `cd VangartPlayground/virtualbox/` 
+
+and follow this guide...
 
 ### Requirement
 
@@ -74,27 +76,27 @@ vagrant snapshot restore base-00
 
 ```
    HOST                     GUEST
-./synced ←←← →→→ /home/student/synced
+/synced ←←← →→→ /home/student/synced
 ```
 
 ### vagrant --version
 
-> Vagrant 2.2.14
+> 2.2.14 +
 
 ### vboxmanage --version
 
-> 6.1.16
+> 6.1.16 +
 
 ### topology
 
 ```
-172.25.250.254    bastion        bastion.lab.example.com
+192.168.56.254    bastion        bastion.lab.example.com
 
-172.25.250.9      workstation    workstation.lab.example.com
-172.25.250.10     servera        servera.lab.example.com
-172.25.250.11     serverb        serverb.lab.example.com
+192.168.56.9      workstation    workstation.lab.example.com
+192.168.56.10     servera        servera.lab.example.com
+192.168.56.11     serverb        serverb.lab.example.com
 
-192.168.1.222     ·······        use this ip for LAN access 
+192.168.56.222     ·······        use this ip for LAN access 
 ```
 
 ### VBox List
