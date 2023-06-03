@@ -1,8 +1,29 @@
 # RHCSA...
 the collection of practice questions and lab environment for ex200 from all around github...
 
+<p align="center">
+  <img width="22%" src="https://res.cloudinary.com/dkmuc5wf9/image/upload/v1611592207/getcert-brand/image-01_b0sbwl.svg" align="center" alt=" " />
+  <h1 align="center">Red Hat - EX200 (RHCSA)</h1>
+  <p align="center">The skills tested in this exam are the foundation for system administration across all Red Hat® products.</p>
+  <br />
+  <!-- <p align="center">
+    <a href="https://github.com/">
+      <img alt="Stars" src="https://img.shields.io/?color=75AADB" />
+    </a>
+    <a href="https://github.com/">
+      <img alt="Forks" src="https://img.shields.io/?color=75AADB" />
+    </a>
+    <a href="https://github.com//LICENSE">
+      <img alt="License" src="https://img.shields.io/github/license/getcert/redhat-ex200" />
+    </a>
+  </p> -->
+</p>
+
+---
 
 [**Red Hat Certified System Administrator (RHCSA)** exam objectives](https://www.redhat.com/en/services/training/ex200-red-hat-certified-system-administrator-rhcsa-exam?section=objectives)
+
+---
 
 **Study points for the exam**
 

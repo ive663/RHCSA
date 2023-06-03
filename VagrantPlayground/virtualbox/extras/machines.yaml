@@ -1,0 +1,22 @@
+---
+# Hostname config. for RH124
+## bastion
+bastion_hostname: 'bastion.lab.example.com'
+bastion_ip: '172.25.250.254'
+bastion_ip_pub: '192.168.1.222'
+bastion_vmname: 'bastion'
+
+## workstation
+workstation_hostname: 'workstation.lab.example.com'
+workstation_ip: '172.25.250.9'
+workstation_vmname: 'workstation'
+
+## servera
+servera_hostname: 'servera.lab.example.com'
+servera_ip: '172.25.250.10'
+servera_vmname: 'servera'
+
+## serverb
+serverb_hostname: 'serverb.lab.example.com'
+serverb_ip: '172.25.250.11'
+serverb_vmname: 'serverb'
