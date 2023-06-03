@@ -1,5 +1,5 @@
 
-# Vagrant Lab Enviroment 
+# RHCSA/RHCE Lab Environment
 
 # Playground
 
