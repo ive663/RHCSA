@@ -1,9 +1,7 @@
-### :star:  RHCSA 
+Made by [soficx](https://github.com/soficx) - https://github.com/soficx/rhcsa
+
   ---
 ![image](redhat.png)<br>
-&nbsp;&nbsp;[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT "MIT License")
-&nbsp;&nbsp;[![Active](http://img.shields.io/badge/Status-Active-green.svg)](https://github.com/soficx/)
- [![Maintenance](https://img.shields.io/badge/last%20updated-20--02--2022-pink)](https://github.com/soficx)
 
   ---
 **Description:** This is a collection of tasks,labs  that i used to practice and prepare for The Red Hat Certified System Administrator (RHCSA) 
