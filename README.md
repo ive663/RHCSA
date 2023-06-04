@@ -1,23 +1,38 @@
 # RHCSA...
 the collection of practice questions and lab environment for ex200 from all around github...
+![image](repo-img/redhat.png)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT "MIT License")
 
 <p align="center">
-  <img width="22%" src="https://res.cloudinary.com/dkmuc5wf9/image/upload/v1611592207/getcert-brand/image-01_b0sbwl.svg" align="center" alt=" " />
   <h1 align="center">Red Hat - EX200 (RHCSA)</h1>
   <p align="center">The skills tested in this exam are the foundation for system administration across all Red Hat® products.</p>
   <br />
-  <!-- <p align="center">
-    <a href="https://github.com/">
-      <img alt="Stars" src="https://img.shields.io/?color=75AADB" />
-    </a>
-    <a href="https://github.com/">
-      <img alt="Forks" src="https://img.shields.io/?color=75AADB" />
-    </a>
-    <a href="https://github.com//LICENSE">
-      <img alt="License" src="https://img.shields.io/github/license/getcert/redhat-ex200" />
-    </a>
-  </p> -->
 </p>
+
+---
+TIP#1
+
+- First thing in exam -> read all questions and pick all related to partitions and logical volumes first. If you make a mistake at beginning you will be able to revert your changes and start exam from scratch. If you make a mistake with partitions in middle-end of exam there will be no time to redo all tasks.
+
+TIP#2
+
+- At the beginning of exam count number of tasks and divide to time you have (2.5h = 150 min.) it will give you average time on one task. If you are spending on some task too much time (double of average time ) drop it, proceed with next question. Is important to finish all “easy tasks” as they will give “easy score points”. You can always return to the hard question at the end of exam if time is left.
+
+TIP#3
+
+- Set up ssh pub key authentification at the beginning of an exam. It will take extra time out of your exam but it will pay off, as you need to reboot your machine regularly to ensure your config is persistent.
+
+TIP#4
+
+- Learn man command , there is no internet on exam host so your best friend will be mandb && man -K topic and catman && man -Kw key_term.
+
+TIP#5
+
+- Set up ssh pub key authentification at the beginning of an exam. It will take extra time out of your exam but it will pay off, as you need to reboot your machine regularly to ensure your config is persistent.
+
+TIP#6
+
+- Develop a habit of checking every step / change you made. For example: add user -> chek /etc/passwd file, made changes to fstab -> reboot machine, ensure partition is mounted.
 
 ---
 ## [**Vagrant Lab Setup**](VagrantPlayground/README.md) - RHCSA/RHCE Lab Environment
@@ -147,7 +162,13 @@ RHCSA exam candidates should be able to accomplish the tasks below without assis
 ### MIT License
 ---
 ```
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR 
+THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 
 Copyright (c) 2023
 ```
